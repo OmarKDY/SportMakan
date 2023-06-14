@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@using Microsoft.Extensions.Localization;
+@using SportMakan.Controllers;
+@inject IStringLocalizer<HomeController> localizer;
+@{
+    ViewData["Title"] = "AboutUs";
+}
+
+<body>
+    <section style="height: 900px; background-image: url(/img/heading-bg.png)!important;" class="first-gallery-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-content">
+                    <h1>@localizer["About"]</h1>
+                        <div class="line-dec"></div>
+                        <span>@localizer["AboutParagraph"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="second-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="service-item">
+                        <div class="icon">
+                            <img src="~/img/second-icon.png" alt="">
+                        </div>
+                        <span>@localizer["IndexStream"]</span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="service-item">
+                        <div class="icon">
+                            <img src="~/img/third-icon.png" alt="">
+                        </div>
+                        <span>@localizer["IndexGames"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>

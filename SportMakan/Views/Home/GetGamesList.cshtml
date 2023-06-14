@@ -1,0 +1,56 @@
+﻿@model IEnumerable<SportMakan.PortalVMS.GamesVM>
+@using Microsoft.AspNetCore.Mvc.Localization;
+@using Microsoft.Extensions.Localization;
+@using SportMakan.Controllers;
+@inject IStringLocalizer<HomeController> localizer;
+
+@{
+    ViewData["Title"] = "Games";
+}
+<style>
+    .first-gallery-section {
+        padding: 518px 0px 15% 0px !important;
+    }
+
+    @@media only screen and (max-width: 850px) {
+        .first-gallery-section {
+            padding: 50px 0px 100px 0px !important;
+        }
+    }
+</style>
+<body>
+    <section style="background-image: url(/img/SportsGames.jpg)!important;" class="first-gallery-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-content">
+                        <h2></h2>
+                        @*<div class="line-dec"></div>*@
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content-wrapper">
+        <div class="inner-container container">
+            <div class="projects-holder-3">
+                <div class="projects-holder">
+                    <div class="row">
+                        @foreach (var item in Model)
+                        {
+                            <div class="col-md-3 col-sm-6 project-item mix nature">
+                                <div>
+                                    <a href="@item.GamePath" target="_blank"><img src="@item.Gamethumb" style="width:290px; height:250px;"  /></a>
+                                </div>
+                                <div style="width:290px; height:100px;" class="text">
+                                    <a href="@item.GamePath" target="_blank"> <h4>@item.GameTitle</h4></a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

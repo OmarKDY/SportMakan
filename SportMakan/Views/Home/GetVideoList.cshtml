@@ -1,0 +1,231 @@
+﻿@using Newtonsoft.Json;
+@using SportMakan.PortalVMS
+@model IEnumerable<SportMakan.PortalVMS.PortalVM>
+@using Microsoft.AspNetCore.Mvc.Localization;
+@using Microsoft.Extensions.Localization;
+@using SportMakan.Controllers;
+@inject IStringLocalizer<HomeController> localizer;
+
+@{
+    ViewData["Title"] = "Stream";
+}
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+</head>
+<style>
+    .first-gallery-section {
+        padding: 518px 0px 15% 0px !important;
+    }
+    @@media only screen and (max-width: 850px) {
+        .first-gallery-section {
+            padding: 50px 0px 100px 0px !important;
+        }
+    }
+</style>
+<body>
+    <section style="background-image: url(/img/SportsVideo.jpg)!important;" class="first-gallery-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-content">
+                        <h2></h2>
+                        @*<div class="line-dec"></div>*@
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content-wrapper">
+        <div class="inner-container container">
+            <div class="projects-holder-3">
+                <div class="filter-categories">
+                    <ul class="project-filter">
+                        @{
+                            // Get the serialized list of collections from Session
+                            var serializedList = Context.Session.GetString("CollectionsList");
+
+                            // Deserialize the list of collections
+                            var collections = JsonConvert.DeserializeObject<List<CollectionVM>>(serializedList);
+                        }
+                        @foreach (var collection in collections)
+                        {
+                            <li class="filter" data-filter="all"><a href="@Url.Action("GetVideoList","Home", new {pageNo= 1, collectionGuid= collection.CollectionGuid})"><span>@collection.CollectionName</span></a></li>
+                        }
+                    </ul>
+                </div>
+                <div id="videos">
+                </div>
+                <div class="projects-holder">
+                    <div class="row">
+                        @foreach (var item in Model)
+                        {
+                            <div class="col-md-3 col-sm-6 project-item mix nature">
+                                <div>
+                                    <a style="cursor:pointer;" class="stream-btn" data-url="@item.VideoDirectURL">
+                                        <video src="@item.VideoURL" width="290" height="250" frameborder="0" allowfullscreen oncontextmenu="return false;"></video>
+                                    </a>
+                                </div>
+                                <div style="width:290px; height:100px;" class="text">
+                                    <button style="cursor:pointer;" class="stream-btn" data-url="@item.VideoDirectURL">Stream Video</button>
+                                    @*<span>@item.Category</span>*@
+                                    <span><i style="font-weight:bold" class="fa fa-eye">@item.TotalWatchTime</i></span>
+                                    <h5 style="font-weight:bolder">@item.VideoTitle</h5>
+                                    @{
+                                        ViewBag.MyValue = @item.CollectionId;
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="text-align:center;">
+        @{
+            int pageSize = 12;
+            int currentPage = 1;
+            int totalPages = (int)Math.Ceiling((decimal)ViewBag.TotalItems / pageSize);
+            int totalItems = ViewBag.TotalItems;
+        }
+
+
+        @if (totalPages > 1)
+        {
+            <nav>
+                <ul class="pagination">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        bool isCurrentPage = (i == currentPage);
+                        <li class="page-item @(isCurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("GetVideoList", "Home", new { pageNo = i, collectionGuid = @ViewBag.MyValue })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            $('.stream-btn').click(function () {
+                var videoUrl = $(this).data('url');
+                console.log(videoUrl);
+                var iframeWidth = '1160';
+                var iframeHeight = '720';
+                if ($(window).width() <= 800) {
+                    iframeWidth = '100%';
+                    iframeHeight = '100%';
+                }
+                var iframe = $('<iframe>', {
+                    src: videoUrl,
+                    frameborder: 0,
+                    allow: 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
+                    allowfullscreen: true,
+                    width: iframeWidth,
+                    height: iframeHeight,
+                    id: 'video-iframe'
+                });
+                var iframeContainer = $('<div>', {
+                    class: 'iframe-container'
+                });
+                iframeContainer.css({
+                    'width': iframeWidth,
+                    'height': iframeHeight,
+                    'position': 'relative'
+                });
+                iframeContainer.append(iframe);
+                var videoWrapper = $('<div>', {
+                    id: 'video-wrapper'
+                });
+                videoWrapper.append(iframeContainer);
+                $('#videos').empty().append(videoWrapper);
+                var closeBtn = $('<button>', {
+                    text: 'Close Media Player',
+                    id: 'close-btn'
+                });
+                $('#videos').append(closeBtn);
+                closeBtn.css({
+                    'position': 'relative',
+                    'left': '50%',
+                    'top': '5%',
+                    'transform': 'translateX(-50%)',
+                    'z-index': '1002'
+                });
+                closeBtn.click(function () {
+                    $('#videos').empty();
+                });
+                if ($(window).width() <= 800) {
+                    $('#video-wrapper').css({
+                        'position': 'fixed',
+                        'top': '20%',
+                        'left': '50%',
+                        'transform': 'translate(-50%, -50%)',
+                        'z-index': 1000,
+                        'width': '100%',
+                        'height': '50%',
+                        'overflow':'hidden',
+                        'background-color': '#000000'
+                    });
+                    $('#video-iframe').css({
+                        'max-width': '100%',
+                        'max-height': '100%',
+                        'width': '100%',
+                        'height': '100%'
+                    });
+                    closeBtn.css({
+                        'position': 'fixed',
+                        'left': '50%',
+                        'top': '5%',
+                        'transform': 'translateX(-50%)',
+                        'z-index': 1002
+                    });
+                } else {
+                    $('#video-wrapper').css({
+                        'width': '1160px',
+                        'height': '720px',
+                        'margin': '0 auto'
+                    });
+                    $('#video-iframe').css({
+                        'width': '100%',
+                        'height': '100%'
+                    });
+                }
+            });
+        });
+        const videos = document.querySelectorAll("video");
+
+        function startPreview(video) {
+            video.muted = true;
+            video.currentTime = 1;
+            video.playbackRate = 0.5;
+            video.play();
+        }
+
+        function stopPreview(video) {
+            video.currentTime = 0;
+            video.playbackRate = 1;
+            video.pause();
+        }
+
+        let previewTimeouts = new Map();
+
+        videos.forEach(video => {
+            video.addEventListener("mouseenter", () => {
+                startPreview(video);
+                previewTimeouts.set(video, setTimeout(() => stopPreview(video), 15000));
+            });
+
+            video.addEventListener("mouseleave", () => {
+                clearTimeout(previewTimeouts.get(video));
+                previewTimeouts.delete(video);
+                stopPreview(video);
+            });
+        });
+
+    </script>
+
+</body>

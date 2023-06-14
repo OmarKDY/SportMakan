@@ -1,0 +1,81 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@using Microsoft.Extensions.Localization;
+@using Newtonsoft.Json;
+@using SportMakan.Controllers;
+@model IEnumerable<SportMakan.PortalVMS.CollectionVM>
+@inject IStringLocalizer<HomeController> localizer;
+@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    #img {
+        width: 292px;
+        height: 250px;
+    }
+    @@media only screen and (max-width: 800px) {
+       #img {
+            width: 361px;
+        }
+    }
+    @@media only screen and (max-width: 850px){
+	.first-section {
+            padding: 150px 0px 0px 0px !important;
+	}
+    }
+</style>
+    <body>
+        <section class="first-section">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="text-content">
+                  <h2></h2>
+                  @*<div class="line-dec"></div>*@
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+    @{
+        // Get the list of collections from @model
+        var collections = Model;
+
+        // Set the value in Session
+        var serializedList = JsonConvert.SerializeObject(collections);
+        Context.Session.SetString("CollectionsList", serializedList);
+    }
+
+        <section class="fourth-section">
+          <div class="container">
+            <div class="row">
+             @foreach (var item in Model)
+                    {
+              <div class="col-md-3 col-sm-6">
+                <div class="portfolio-item first-item">
+                  <div class="image">
+                                <a href=@item.ImagePath data-lightbox="image-1"><img id="img" src=@item.ImagePath></a>
+                  </div>
+                  <div class="text">
+                    <a href="@Url.Action("GetVideoList","Home", new {pageNo= 1, collectionGuid= item.CollectionGuid})"><h4>@item.CollectionName</h4></a>
+                    <span>@item.VideoCount</span>
+                  </div>
+                </div>
+              </div>
+                    }
+            </div>
+                        <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="portfolio-item first-item">
+                        <div class="image">
+                            <a href="~/img/SquareFit_20234298284801.jpg" data-lightbox="image-1"><img id="img" src="~/img/SquareFit_20234298284801.jpg"></a>
+                        </div>
+                        <div class="text">
+                            <a asp-area="" asp-controller="Home" asp-action="GetGamesList"><h4>Gaming</h4></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </section>
+    </body>

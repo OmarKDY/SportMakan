@@ -1,0 +1,17 @@
+﻿@using Newtonsoft.Json;
+@using SportMakan.PortalVMS
+
+
+@{
+    // Get the serialized list of collections from Session
+    var serializedList = Context.Session.GetString("CollectionsList");
+
+    // Deserialize the list of collections
+    var collections = JsonConvert.DeserializeObject<List<CollectionVM>>(serializedList);
+}
+<ul id="sub-dropdown" class="navbar-nav">
+    @foreach (var item in collections)
+    {
+        <li class="nav-item"><a href="@Url.Action("GetVideoList","Home", new {pageNo= 1, collectionGuid= item.CollectionGuid})"><span>@item.CollectionName</span></a></li>
+    }
+</ul>
