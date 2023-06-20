@@ -93,6 +93,8 @@ namespace SportMakan.Controllers
                         VideoURL = $"https://vz-55763dd7-a9a.b-cdn.net/{(Guid)item["guid"]}/play_240p.mp4",
                         VideoDirectURL = $"https://video.bunnycdn.com/play/111009/{(Guid)item["guid"]}",
                         CollectionId = (Guid)item["collectionId"],
+                        ThumbnailFileName = (string)item["thumbnailFileName"]
+
                     };
                      portalVMS.Add(portalVM);
                 }

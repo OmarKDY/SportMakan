@@ -22,6 +22,37 @@
             padding: 50px 0px 100px 0px !important;
         }
     }
+
+    .video-container {
+        position: relative;
+        width: 290px;
+        height: 250px;
+    }
+
+    .video-container {
+        position: relative;
+    }
+
+        .video-container .preview-active {
+            z-index: 1000;
+        }
+
+    .project-filter {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+    }
+
+        .project-filter::-webkit-scrollbar {
+            display: none;
+        }
+
+        .project-filter li {
+            white-space: nowrap;
+        }
+
 </style>
 <body>
     <section style="background-image: url(/img/SportsVideo.jpg)!important;" class="first-gallery-section">
@@ -41,19 +72,22 @@
         <div class="inner-container container">
             <div class="projects-holder-3">
                 <div class="filter-categories">
-                    <ul class="project-filter">
-                        @{
-                            // Get the serialized list of collections from Session
-                            var serializedList = Context.Session.GetString("CollectionsList");
+                    <div style="overflow-x: hidden;">
+                        <ul class="project-filter">
+                            @{
+                                // Get the serialized list of collections from Session
+                                var serializedList = Context.Session.GetString("CollectionsList");
 
-                            // Deserialize the list of collections
-                            var collections = JsonConvert.DeserializeObject<List<CollectionVM>>(serializedList);
-                        }
-                        @foreach (var collection in collections)
-                        {
-                            <li class="filter" data-filter="all"><a href="@Url.Action("GetVideoList","Home", new {pageNo= 1, collectionGuid= collection.CollectionGuid})"><span>@collection.CollectionName</span></a></li>
-                        }
-                    </ul>
+                                // Deserialize the list of collections
+                                var collections = JsonConvert.DeserializeObject<List<CollectionVM>>(serializedList);
+                            }
+                            @foreach (var collection in collections)
+                            {
+                                <li class="filter" data-filter="all"><a href="@Url.Action("GetVideoList","Home", new {pageNo= 1, collectionGuid= collection.CollectionGuid})"><span>@collection.CollectionName</span></a></li>
+                            }
+                        </ul>
+                    </div>
+
                 </div>
                 <div id="videos">
                 </div>
@@ -63,8 +97,10 @@
                         {
                             <div class="col-md-3 col-sm-6 project-item mix nature">
                                 <div>
-                                    <a style="cursor:pointer;" class="stream-btn" data-url="@item.VideoDirectURL">
-                                        <video src="@item.VideoURL" width="290" height="250" frameborder="0" allowfullscreen oncontextmenu="return false;"></video>
+                                    <a style="cursor:pointer;" @*class="stream-btn"*@ @*data-url="@item.VideoDirectURL"*@>
+                                        <div crossorigin="anonymous" class="video-container">
+                                            <video crossorigin="anonymous" src="@item.VideoURL#t=0.10" width="290" height="250" frameborder="0" allowfullscreen playsinline muted oncontextmenu="return false;"></video>
+                                        </div>
                                     </a>
                                 </div>
                                 <div style="width:290px; height:100px;" class="text">
@@ -196,35 +232,35 @@
                 }
             });
         });
+
         const videos = document.querySelectorAll("video");
 
         function startPreview(video) {
             video.muted = true;
             video.currentTime = 1;
-            video.playbackRate = 0.5;
+            video.playbackRate = 1;
             video.play();
+            video.parentElement.classList.add('preview-active');
         }
 
         function stopPreview(video) {
             video.currentTime = 0;
             video.playbackRate = 1;
             video.pause();
+            video.parentElement.classList.remove('preview-active');
         }
 
-        let previewTimeouts = new Map();
-
         videos.forEach(video => {
-            video.addEventListener("mouseenter", () => {
-                startPreview(video);
-                previewTimeouts.set(video, setTimeout(() => stopPreview(video), 15000));
-            });
-
-            video.addEventListener("mouseleave", () => {
-                clearTimeout(previewTimeouts.get(video));
-                previewTimeouts.delete(video);
-                stopPreview(video);
+            video.addEventListener("click", () => {
+                if (video.parentElement.classList.contains('preview-active')) {
+                    stopPreview(video);
+                } else {
+                    startPreview(video);
+                    setTimeout(() => stopPreview(video), 15000);
+                }
             });
         });
+
 
     </script>
 
